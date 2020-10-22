@@ -2,7 +2,7 @@
 # Copyright 2018 Camptocamp SA - Julien Coux
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare
 
@@ -11,6 +11,13 @@ class StockPicking(models.Model):
     """Adds picking split without done state."""
 
     _inherit = "stock.picking"
+
+    split_backorder_id = fields.Many2one(
+        'stock.picking', 'Split Back Order of',
+        copy=False, index=True,
+        states={'done': [('readonly', True)], 'cancel': [('readonly', True)]},
+        help="If this shipment was split, then this field links to the "
+             "shipment which contains the already processed part.")
 
     @api.multi
     def split_process(self):
@@ -59,7 +66,7 @@ class StockPicking(models.Model):
                     'name': '/',
                     'move_lines': [],
                     'move_line_ids': [],
-                    'backorder_id': picking.id,
+                    'split_backorder_id': picking.id,
                 })
                 picking.message_post(
                     body=_(

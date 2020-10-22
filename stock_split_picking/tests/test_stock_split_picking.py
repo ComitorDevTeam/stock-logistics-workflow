@@ -68,7 +68,7 @@ class TestStockSplitPicking(SavepointCase):
         self.assertEqual(self.picking.state, 'assigned')
         # An another one with 6 units in state assigned
         new_picking = self.env['stock.picking'].search(
-            [('backorder_id', '=', self.picking.id)], limit=1)
+            [('split_backorder_id', '=', self.picking.id)], limit=1)
         move_line = self.env['stock.move.line'].search(
             [('picking_id', '=', new_picking.id)], limit=1)
 
